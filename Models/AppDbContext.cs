@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EFcoreLearn_0.View.Models
 {
@@ -7,18 +8,44 @@ namespace EFcoreLearn_0.View.Models
     {
         public DbSet<Person> Persons {get; set;} = null!;
         public DbSet<PersonRole> PersonRoles {get; set;} = null!;
+        
+        
+        private StreamWriter LogStream {get; } = new StreamWriter("DbLog.txt", true);
 
-        private Action<string> Logger {get; set;} = null!;
 
-
-        public AppDbContext(DbContextOptions<AppDbContext> options, Action<string> logger) : base(options) 
-        {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) =>
             Database.EnsureCreated();
-            Logger = logger;
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-            optionsBuilder.LogTo(Logger ?? throw new Exception("Logger is null!"), new[] { RelationalEventId.CommandExecuted});
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+            optionsBuilder.LogTo(LogStream.WriteLine, new[] { RelationalEventId.CommandExecuted}
+                , Microsoft.Extensions.Logging.LogLevel.Information);
+
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<PersonRole>(entity => {
+                entity.HasIndex(e => e.Name).IsUnique();
+            });
+        }
+
+
+
+
+
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            LogStream.Dispose();
+        }
+    
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync();
+            await LogStream.DisposeAsync();
+        }
 
     }
+
+
 }

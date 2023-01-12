@@ -1,12 +1,14 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
 namespace EFcoreLearn_0.View.Models
 {   
-    [Table("person_role")]
+    [Table("PersonRole")]
     public class PersonRole
     {
-        [Column("role_id")]
+        [Key]
         public int Id {get; set;}
-        [Column("role_name")]
+        [Required, MaxLength(25)]
         public string? Name {get; set;}
 
 

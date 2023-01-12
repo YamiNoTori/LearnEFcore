@@ -1,16 +1,19 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+
 namespace EFcoreLearn_0.View.Models
 {
     [Table("person")]
     public class Person
     {
-        [Column("person_id")]
+        [Key]
         public int Id {get; set;}
-        [Column("person_role_id")]
-        public int RoleId {get; set;}
-        [Column("person_name")]
+        [Required]
+        public PersonRole? Role {get; set;}
+        [Required, MaxLength(15)]
         public string? Name {get; set;}
-        [Column("person_age")]
+        [Required]
         public int Age {get; set;}
     }
 }
